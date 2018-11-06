@@ -47,7 +47,7 @@ def main():
     for i, row in games.iterrows():
         team_a = []
         team_b = []
-        result = TIE
+        result = 2 # 2 is tie in the csv
         for j, column in row.iteritems():
             if j.startswith("TeamA"):
                 team_a.append(column)
