@@ -1,3 +1,3 @@
 # manco_skill
 
-Rating noobs one at a time
+Very hacky noob rater
