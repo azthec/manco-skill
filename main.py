@@ -3,6 +3,13 @@ import trueskill
 import itertools
 import math
 
+DEBUG = 0
+
+
+def debug(arg):
+    if DEBUG == 1:
+        print(arg)
+
 
 def win_probability(team1, team2):
     delta_mu = sum(r.mu for r in team1) - sum(r.mu for r in team2)
@@ -13,41 +20,30 @@ def win_probability(team1, team2):
     return ts.cdf(delta_mu / denom)
 
 
-def main():
-    print(trueskill.Rating())
-    r1 = trueskill.Rating()
-    r2 = trueskill.Rating()
-    p1 = trueskill.Rating()
-    p2 = trueskill.Rating()
-    t1 = [r1, r2]
-    t2 = [p1, p2]
-    print('{:.1%} chance to draw'.format(trueskill.quality([t1, t2])))
-    (r1, r2), (p1, p2) = trueskill.rate([t1, t2], ranks=[0, 1])
-    t1 = [r1, r2]
-    t2 = [p1, p2]
-
-    # players = pd.read_csv('players.csv')
-    # uniques = []
-    # df = pd.read_csv('games.csv')
-    # for elem in df:
-    #     uniques += list(df[elem].unique())
-    # uniques = set(uniques)
-    # print(df)
-    # print(uniques.difference(set(list(players['Player'].unique()))))
-
+def temp_unique():
     players = pd.read_csv('players.csv')
+    uniques = []
+    df = pd.read_csv('games.csv')
+    for elem in df:
+        uniques += list(df[elem].unique())
+    uniques = set(uniques)
+
+    return len(uniques.difference(set(list(players['Player'].unique()))) -
+               {0, 1, 2}) == 0
+
+
+def calculate_ratings():
+    player_list = pd.read_csv('players.csv')
     games = pd.read_csv('games.csv')
     ratings = {}
 
-    for player in players['Player'].unique():
+    for player in player_list['Player'].unique():
         ratings[player] = trueskill.Rating()
-
-    print(ratings)
 
     for i, row in games.iterrows():
         team_a = []
         team_b = []
-        result = 2 # 2 is tie in the csv
+        result = 2  # 2 is tie in the csv
         for j, column in row.iteritems():
             if j.startswith("TeamA"):
                 team_a.append(column)
@@ -57,7 +53,7 @@ def main():
                 result = column
             else:
                 raise(Exception)
-        
+
         rated_a = []
         rated_b = []
 
@@ -66,7 +62,7 @@ def main():
         for player in team_b:
             rated_b.append(ratings[player])
 
-        print('{:.1%} chance to draw'.format(trueskill.quality([rated_a,
+        debug('{:.1%} chance to draw'.format(trueskill.quality([rated_a,
                                                                 rated_b])))
 
         if result == 0:
@@ -78,21 +74,22 @@ def main():
 
         for player, rating in zip(team_a, rated_a):
             ratings[player] = rating
-        
+
         for player, rating in zip(team_b, rated_b):
             ratings[player] = rating
 
-    todays_players = ["rick", "mig", "leugim", "luisao", "bernardo",
-                      "teds", "dig", "kenps", "miguel", "dias"]
+    return ratings
 
+
+def matchmake(ratings, players):
     rated_a = []
     rated_b = []
-    tie_chance = 0
-    potential_a = []
-    potential_b = []
+    ties = [0]
+    matches_a = []
+    matches_b = []
     attempt = 0
-    for team_a in list(itertools.combinations(todays_players, 5)):
-        team_b = [x for x in todays_players if x not in team_a]
+    for team_a in list(itertools.combinations(players, 5)):
+        team_b = [x for x in players if x not in team_a]
         rated_a = []
         rated_b = []
 
@@ -102,21 +99,54 @@ def main():
             rated_b.append(ratings[player])
 
         quality = trueskill.quality([rated_a, rated_b])
-        if quality > tie_chance:
-            potential_a = team_a
-            potential_b = team_b
-            tie_chance = quality
+        if quality > ties[0]:
+            matches_a.insert(0, team_a)
+            matches_b.insert(0, team_b)
+            ties.insert(0, quality)
+            debug("{}: {:.1%} chance to draw".format(attempt, ties[0]))
 
         attempt += 1
-        print("{}: {:.1%} chance to draw".format(attempt, tie_chance))
 
-    print()
-    print("FINISHED!")
-    print("Team A")
-    print(*potential_a)
-    print("Team B")
-    print(*potential_b)
-    print("{:.1%} chance to draw".format(tie_chance))
+    return matches_a, matches_b, ties
+
+
+def print_matches(matches_a, matches_b, ties, top=4):
+    for team_a, team_b, tie, cycle in zip(matches_a, matches_b, ties, range(top)):
+        print('*' * 20)
+        print("#{}".format(cycle))
+        print("Team A:")
+        print(*team_a)
+        print()
+        print("Team B:")
+        print(*team_b)
+        print('_' * 20)
+        print("{:.1%} chance to draw".format(tie))
+        print('*' * 20)
+        print()
+
+
+def print_ratings():
+    pass
+
+
+def get_team(players):
+    players = ["rick", "mig", "leugim", "luisao", "bernardo",
+               "teds", "dig", "kenps", "miguel", "dias"]
+    ratings = calculate_ratings()
+    matches_a, matches_b, ties = matchmake(ratings, players)
+    print_matches(matches_a, matches_b, ties)
+
+
+def get_ratings():
+    ratings = calculate_ratings()
+    print("{0: <20} | {1: <6} | {2: <6} |".format("Player", "Mu", "Sigma"))
+    for player, rating in ratings.items():
+        print("{0: <20} | {1: <6.3} | {2: <6.3} |".format(player, rating.mu, rating.sigma))
+
+
+def main():
+    # get_team(players)
+    get_ratings()
 
 
 if __name__ == '__main__':
