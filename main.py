@@ -113,14 +113,14 @@ def matchmake(ratings, players):
 def print_matches(matches_a, matches_b, ties, top=1):
     for team_a, team_b, tie, cycle in zip(matches_a, matches_b, ties, range(top)):
         print('*' * 20)
-        print("#{}".format(cycle))
+        print("#{}".format(cycle + 1))
         print("Team A:")
         print(*team_a)
         print()
         print("Team B:")
         print(*team_b)
         print('_' * 20)
-        print("{:.1%} chance to draw".format(tie))
+        print("{:.2%} chance to draw".format(tie))
         print('*' * 20)
         print()
 
@@ -131,12 +131,12 @@ def print_ratings(ratings):
         print("{0: <20} | {1: <6.3} | {2: <6.3} |".format(player, rating.mu, rating.sigma))
 
 
-def get_team(players):
+def get_team():
     players = ["rick", "mig", "leugim", "luisao", "bernardo",
                "teds", "dig", "kenps", "miguel", "dias"]
     ratings = calculate_ratings()
-    matches_a, matches_b, ties = matchmake(ratings, players, top=3)
-    print_matches(matches_a, matches_b, ties)
+    matches_a, matches_b, ties = matchmake(ratings, players)
+    print_matches(matches_a, matches_b, ties, top=3)
 
 
 def get_ratings():
@@ -145,7 +145,7 @@ def get_ratings():
 
 
 def main():
-    # get_team(players)
+    # get_team()
     get_ratings()
 
 
