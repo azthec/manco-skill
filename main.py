@@ -110,7 +110,7 @@ def matchmake(ratings, players):
     return matches_a, matches_b, ties
 
 
-def print_matches(matches_a, matches_b, ties, top=4):
+def print_matches(matches_a, matches_b, ties, top=1):
     for team_a, team_b, tie, cycle in zip(matches_a, matches_b, ties, range(top)):
         print('*' * 20)
         print("#{}".format(cycle))
@@ -125,23 +125,23 @@ def print_matches(matches_a, matches_b, ties, top=4):
         print()
 
 
-def print_ratings():
-    pass
+def print_ratings(ratings):
+    print("{0: <20} | {1: <6} | {2: <6} |".format("Player", "Mu", "Sigma"))
+    for player, rating in ratings.items():
+        print("{0: <20} | {1: <6.3} | {2: <6.3} |".format(player, rating.mu, rating.sigma))
 
 
 def get_team(players):
     players = ["rick", "mig", "leugim", "luisao", "bernardo",
                "teds", "dig", "kenps", "miguel", "dias"]
     ratings = calculate_ratings()
-    matches_a, matches_b, ties = matchmake(ratings, players)
+    matches_a, matches_b, ties = matchmake(ratings, players, top=3)
     print_matches(matches_a, matches_b, ties)
 
 
 def get_ratings():
     ratings = calculate_ratings()
-    print("{0: <20} | {1: <6} | {2: <6} |".format("Player", "Mu", "Sigma"))
-    for player, rating in ratings.items():
-        print("{0: <20} | {1: <6.3} | {2: <6.3} |".format(player, rating.mu, rating.sigma))
+    print_ratings(ratings)
 
 
 def main():
