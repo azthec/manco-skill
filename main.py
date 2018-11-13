@@ -2,6 +2,7 @@ import pandas as pd
 import trueskill
 import itertools
 import math
+import operator
 
 DEBUG = 0
 
@@ -119,10 +120,31 @@ def print_matches(matches_a, matches_b, ties, top=1):
         print()
 
 
-def print_ratings(ratings):
-    print("{0: <20} | {1: <6} | {2: <6} |".format("Player", "Mu", "Sigma"))
+def print_ratings(ratings, sorted=False):
+    df = pd.DataFrame(columns=['Player', 'Mu', 'Sigma'])
     for player, rating in ratings.items():
-        print("{0: <20} | {1: <6.3} | {2: <6.3} |".format(player, rating.mu, rating.sigma))
+        df.loc[len(df)] = [player, rating.mu, rating.sigma]
+
+    if sorted:
+        df = df.sort_values('Mu', ascending=0)
+
+    print("{0: <20} | {1: <6} | {2: <6} |".format("Player", "Mu", "Sigma"))
+    for index, row in df.iterrows():
+        print("{0: <20} | {1: <6.3} | {2: <6.3} |".format(row['Player'],
+                                                          row['Mu'], row['Sigma']))
+
+
+def print_csv_ratings(ratings, sorted=False):
+    df = pd.DataFrame(columns=['Player', 'Mu', 'Sigma'])
+    for player, rating in ratings.items():
+        df.loc[len(df)] = [player, rating.mu, rating.sigma]
+
+    if sorted:
+        df = df.sort_values('Mu', ascending=0)
+
+    print("{0},{1},{2}".format("Player", "Mu", "Sigma"))
+    for index, row in df.iterrows():
+        print("{0},{1:.3},{2:.3}".format(row['Player'], row['Mu'], row['Sigma']))
 
 
 def load_game_ratings():
@@ -151,12 +173,13 @@ def get_team():
 
 def get_ratings():
     ratings = load_game_ratings()
-    print_ratings(ratings)
+    print_ratings(ratings, sorted=True)
+    # print_csv_ratings(ratings, sorted=True)
 
 
 def main():
-    get_team()
-    # get_ratings()
+    # get_team()
+    get_ratings()
 
 
 if __name__ == '__main__':
