@@ -32,13 +32,7 @@ def temp_unique():
                {0, 1, 2}) == 0
 
 
-def calculate_ratings():
-    player_list = pd.read_csv('players.csv')
-    games = pd.read_csv('games.csv')
-    ratings = {}
-
-    for player in player_list['Player'].unique():
-        ratings[player] = trueskill.Rating()
+def calculate_ratings(ratings, player_list, games):
 
     for i, row in games.iterrows():
         team_a = []
@@ -131,22 +125,38 @@ def print_ratings(ratings):
         print("{0: <20} | {1: <6.3} | {2: <6.3} |".format(player, rating.mu, rating.sigma))
 
 
+def load_game_ratings():
+    player_list = pd.read_csv('players.csv')
+    ratings = {}
+
+    for player in player_list['Player'].unique():
+        ratings[player] = trueskill.Rating()
+
+    games = pd.read_csv('games_4vs4.csv')
+    ratings = calculate_ratings(ratings, player_list, games)
+    games = pd.read_csv('games_5vs5.csv')
+    ratings = calculate_ratings(ratings, player_list, games)
+    games = pd.read_csv('games_7vs7.csv')
+    ratings = calculate_ratings(ratings, player_list, games)
+    return ratings
+
+
 def get_team():
-    players = ["rick", "mig", "leugim", "luisao", "bernardo",
-               "teds", "dig", "kenps", "miguel", "dias"]
-    ratings = calculate_ratings()
+    players = ["rick", "teds", "dig", "mig", "miguel",
+               "dias", "mec", "leugim", "kenps", "bernardo"]
+    ratings = load_game_ratings()
     matches_a, matches_b, ties = matchmake(ratings, players)
     print_matches(matches_a, matches_b, ties, top=3)
 
 
 def get_ratings():
-    ratings = calculate_ratings()
+    ratings = load_game_ratings()
     print_ratings(ratings)
 
 
 def main():
-    # get_team()
-    get_ratings()
+    get_team()
+    # get_ratings()
 
 
 if __name__ == '__main__':
