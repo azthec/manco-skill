@@ -164,7 +164,7 @@ def load_game_ratings():
 
 
 def get_team():
-    players = ["teds","dig","rick","mig","bernardo","dias","mec","miguel","joao_martins","diegues"]
+    players = ["teds","nram","rick","mig","bernardo","dias","mec","miguel","joao_martins","diegues"]
     ratings = load_game_ratings()
     matches_a, matches_b, ties = matchmake(ratings, players)
     print_matches(matches_a, matches_b, ties, top=4)
