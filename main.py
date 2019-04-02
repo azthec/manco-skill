@@ -22,7 +22,7 @@ def win_probability(team1, team2):
 
 
 def temp_unique():
-    players = pd.read_csv('players.csv')
+    players = pd.read_csv('players.csv', encoding='latin-1')
     uniques = []
     df = pd.read_csv('games.csv')
     for elem in df:
@@ -148,27 +148,26 @@ def print_csv_ratings(ratings, sorted=False):
 
 
 def load_game_ratings():
-    player_list = pd.read_csv('players.csv')
+    player_list = pd.read_csv('players.csv', encoding='latin-1')
     ratings = {}
 
     for player in player_list['Player'].unique():
         ratings[player] = trueskill.Rating()
 
-    games = pd.read_csv('games_4vs4.csv')
+    games = pd.read_csv('games_4vs4.csv', encoding='latin-1')
     ratings = calculate_ratings(ratings, player_list, games)
-    games = pd.read_csv('games_5vs5.csv')
+    games = pd.read_csv('games_5vs5.csv', encoding='latin-1')
     ratings = calculate_ratings(ratings, player_list, games)
-    games = pd.read_csv('games_7vs7.csv')
+    games = pd.read_csv('games_7vs7.csv', encoding='latin-1')
     ratings = calculate_ratings(ratings, player_list, games)
     return ratings
 
 
 def get_team():
-    players = ["rick", "teds", "dig", "mig", "miguel",
-               "dias", "mec", "leugim", "kenps", "bernardo"]
+    players = ["teds","dig","rick","mig","bernardo","dias","mec","miguel","joao_martins","diegues"]
     ratings = load_game_ratings()
     matches_a, matches_b, ties = matchmake(ratings, players)
-    print_matches(matches_a, matches_b, ties, top=3)
+    print_matches(matches_a, matches_b, ties, top=4)
 
 
 def get_ratings():
@@ -178,7 +177,7 @@ def get_ratings():
 
 
 def main():
-    # get_team()
+    get_team()
     get_ratings()
 
 
