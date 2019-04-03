@@ -3,6 +3,7 @@ import trueskill
 import itertools
 import math
 import operator
+import sys
 
 DEBUG = 0
 
@@ -164,7 +165,7 @@ def load_game_ratings():
 
 
 def get_team():
-    players = ["teds","nram","rick","mig","bernardo","dias","mec","miguel","joao_martins","diegues"]
+    players = ["teds","dig","rick","mig","bernardo","dias","mec","miguel","joao_martins","diegues"]
     ratings = load_game_ratings()
     matches_a, matches_b, ties = matchmake(ratings, players)
     print_matches(matches_a, matches_b, ties, top=4)
@@ -177,9 +178,15 @@ def get_ratings():
 
 
 def main():
-    get_team()
-    get_ratings()
-
+    if (len(sys.argv) != 2):
+        print("Invalid arguments! 1 for teams, 2 for ratings.")
+        return
+    if (sys.argv[1] == "1"):
+        get_team()
+    elif (sys.argv[1] == "2"):
+        get_ratings()
+    else:
+        print("Invalid arguments! 1 for teams, 2 for ratings.")
 
 if __name__ == '__main__':
     main()
